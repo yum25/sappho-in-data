@@ -10,7 +10,7 @@ def main():
     for i in range(1, 153):
         sets.append(set())
         try:
-            with open('fragments/f{0}.txt'.format(i), 'r') as file:
+            with open('analysis/fragments/f{0}.txt'.format(i), 'r') as file:
                 lines = file.readlines()
 
                 for line in lines:
@@ -52,6 +52,17 @@ def main():
                 clusters[label].append(i + 1)
     
     print(clusters)
+
+    with open('analysis/clusters.json', 'w') as f:
+        f.write(str(clusters))
+
+
+    wordsets = []
+    for i in range(0, len(sets)):
+        wordsets.append(list(sets[i]))
+
+    with open('analysis/sets.json', 'w') as f:
+        f.write(str(wordsets))
 
     
 
