@@ -93,7 +93,7 @@
 <main>
 	<header>
 		<h1><i>Sappho</i> in Data</h1>
-		<address><b>@yum25</b></address>
+		<address><a href="https://yum25.github.io"><b>@yum25</b></a></address>
 	</header>
 
 	<div id="cluster">
@@ -236,6 +236,10 @@
 		font-style: normal;
 		text-align: center;
 	}
+
+  address a {
+    color: inherit;
+  }
 
 	#cluster {
 		display: flex;
