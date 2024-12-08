@@ -246,6 +246,8 @@
 		justify-content: center;
 		align-items: center;
 
+    flex-wrap: wrap-reverse;
+
 		height: 100%;
 		width: 100%;
 	}
@@ -253,6 +255,8 @@
 	#cluster > svg {
 		max-height: 100vh;
 		min-height: 50rem;
+
+    min-width: min(50rem, 100%);
 	}
 
 	#cluster > section {
