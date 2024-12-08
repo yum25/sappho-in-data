@@ -134,7 +134,7 @@
 						filter="url(#watercolor)"
 						role="none"
 						on:mouseenter={() => {
-							if (fragment.r < 15) {
+							if (fragment.r < 30) {
 								onHoverNode = fragment.data.name;
 							}
 						}}
