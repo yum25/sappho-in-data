@@ -6,12 +6,13 @@
 
 	let svg: SVGElement;
 
-  let innerHeight:number|undefined = undefined;
+	let innerHeight: number | undefined = undefined;
 	const height = (innerHeight ?? 900) + 200;
-	const width = (innerHeight ??  900) + 200;
+	const width = (innerHeight ?? 900) + 200;
 	const margin = 50;
 
 	let showHierarchy = false;
+	let onHoverNode: number = 0;
 
 	const pack = d3
 		.pack()
@@ -65,17 +66,16 @@
 			'x',
 			d3
 				.forceX()
-				.strength(0.01)
+				.strength(0.005)
 				.x((d) => x((d as d3.HierarchyNode<Fragment>).data.group))
 		)
 		.force(
 			'y',
 			d3
 				.forceY()
-				.strength(0.01)
+				.strength(0.005)
 				.y((d) => y((d as d3.HierarchyNode<Fragment>).data.group))
 		)
-		.force('charge', d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
 		.force(
 			'collide',
 			d3
@@ -126,53 +126,62 @@
 				{/if}
 
 				{#each data as fragment}
-					<g filter="url(#watercolor)">
-						<circle
-							r={fragment.r}
-							fill={color(fragment.data.group)}
-							cx={fragment.x}
-							cy={fragment.y}
-						>
-						</circle>
-						<text x={fragment.x} y={fragment.y + 4} text-anchor="middle" fill="white"
-							>{fragment.data.name}</text
+					{@const r = onHoverNode == fragment.data.name ? 30 : fragment.r}
+					<g
+						filter="url(#watercolor)"
+						role="none"
+						on:mouseenter={() => {
+							if (fragment.r < 15) {
+								onHoverNode = fragment.data.name;
+							}
+						}}
+						on:mouseleave={() => {
+							if (fragment.r < 30) {
+								onHoverNode = 0;
+							}
+						}}
+					>
+						<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y}> </circle>
+						<text
+							x={fragment.x}
+							y={fragment.y + 4}
+							text-anchor="middle"
+							fill="white"
+              font-size={r >= 30 ? 25: 15}
+							clip-path={`circle(${r})`}>{fragment.data.name}</text
 						>
 					</g>
 				{/each}
 			</g>
 		</svg>
 		<section>
-			<h2>Lorem Ipsum Dolor Sit</h2>
+			<h2>Categorizing Sappho</h2>
 			<p>
-				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
-				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
-				minus nisi quia deleniti!
+				The literary corpus of Sappho is rife with references to mortals and gods alike -
+				<span style="background: lightpink;">Aphrodite</span>, Gonglya, Atthis, and brimming with
+				descriptions of
+				<span style="background: rgb(129, 194, 129);">beauty</span> and
+				<span style="background: lavender;">nature</span>.
 			</p>
 			<p>
-				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
-				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
-				minus nisi quia deleniti!
+				The strong thematic similarity between poems, both in who they invoke and what they describe
+				makes Sappho's fragments an especially interesting subject to place in distinct categories.
+				I wondered: what if I tried to group these poems using a machine learning algorithm?
 			</p>
 			<p>
-				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
-				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
-				minus nisi quia deleniti!
+				Through measuring the <span style="text-decoration: underline;"
+					>number of words in common between fragments</span
+				>
+				and a little bit of math, I created a data visualization where each distinct <b>grouping</b>
+				is repesented with a different <b style="color: blue;">color</b> compared to those around it.
 			</p>
-			<h2>Lorem Ipsum Dolor Sit</h2>
-			<p>
-				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
-				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
-				minus nisi quia deleniti!
-			</p>
-			<p>
-				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
-				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
-				minus nisi quia deleniti!
-			</p>
-			<p>
-				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
-				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
-				minus nisi quia deleniti!
+			<div style="margin: 2rem 0rem;">
+				<input type="checkbox" id="hierarchy" bind:checked={showHierarchy} />
+				<label for="hierarchy"><b>See distinct fragment groupings</b></label>
+			</div>
+			<p style="margin-top: 2rem;">
+				These fragments are translated by <b>Anne Carson</b>, in her collection:
+				<i>If Not, Winter</i>.
 			</p>
 		</section>
 	</div>
@@ -184,6 +193,10 @@
 
 		box-sizing: border-box;
 		padding: 5px;
+	}
+
+	p {
+		line-height: 1.4;
 	}
 
 	header {
@@ -209,13 +222,13 @@
 		justify-content: center;
 		align-items: center;
 
-    height: 100%;
-    width: 100%;
+		height: 100%;
+		width: 100%;
 	}
 
 	#cluster > svg {
 		max-height: 100vh;
-    min-height: 50rem;
+		min-height: 50rem;
 	}
 
 	#cluster > section {
