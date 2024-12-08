@@ -1,98 +1,91 @@
 <script lang="ts">
 	import * as d3 from 'd3';
 
+	import type { Fragment } from '$lib/types';
+	import hierarchy from '$lib/analysis/hierarchy.json';
+
 	let svg: SVGElement;
 
-	let groups = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+	const height = 1100;
+	const width = 1100;
+	const margin = 50;
 
-	// create dummy data -> just one element per circle
-	let data = [
-		{ name: 'A', group: 1, size: 15 },
-		{ name: 'B', group: 1, size: 10 },
-		{ name: 'C', group: 1, size: 25 },
-		{ name: 'D', group: 1, size: 25 },
-		{ name: 'E', group: 1, size: 25 },
-		{ name: 'F', group: 1, size: 15 },
-		{ name: 'G', group: 2, size: 35 },
-		{ name: 'H', group: 2, size: 25 },
-		{ name: 'I', group: 2, size: 25 },
-		{ name: 'J', group: 2, size: 25 },
-		{ name: 'K', group: 2, size: 15 },
-		{ name: 'L', group: 2, size: 35 },
-		{ name: 'M', group: 3, size: 25 },
-		{ name: 'N', group: 3, size: 35 },
-		{ name: 'O', group: 3, size: 25 },
-		{ name: 'A', group: 4, size: 15 },
-		{ name: 'B', group: 4, size: 10 },
-		{ name: 'C', group: 4, size: 25 },
-		{ name: 'D', group: 4, size: 25 },
-		{ name: 'E', group: 4, size: 25 },
-		{ name: 'F', group: 4, size: 15 },
-		{ name: 'G', group: 5, size: 35 },
-		{ name: 'H', group: 5, size: 25 },
-		{ name: 'I', group: 5, size: 25 },
-		{ name: 'J', group: 5, size: 25 },
-		{ name: 'K', group: 5, size: 15 },
-		{ name: 'L', group: 5, size: 35 },
-		{ name: 'M', group: 6, size: 25 },
-		{ name: 'N', group: 6, size: 35 },
-		{ name: 'O', group: 6, size: 25 }
-	];
+	const pack = d3
+		.pack()
+		.size([height - margin, width - margin])
+		.padding(1);
 
-	let displayData = [];
+	const root = pack(
+		d3
+			.hierarchy(hierarchy as unknown)
+			.sum((d) => (d as Fragment).size)
+			.sort((a, b) => b.data.size - a.data.size)
+	);
 
-	function update() {
-		console.log(data);
-		displayData = data;
-		return data;
-	}
+	let packingData = root.descendants();
 
-	var color = d3.scaleOrdinal().domain(groups).range(['cornflowerblue', 'goldenrod', '#8E9ED1', '#C3B1E1', '#8FBC8B', '#568203']);
+	let data = packingData.filter((d) => d.depth == 2) as d3.HierarchyCircularNode<Fragment>[];
+	let posMappings = packingData.filter((d) => d.depth == 1);
 
-	let x = d3.scaleOrdinal().domain(groups).range([220, 440, 660]);
-	let y = d3
+	console.log(root);
+
+	const color = d3
 		.scaleOrdinal()
-		.domain(groups)
-		.range([157, 157, 157, 314, 314, 314, 471, 471, 471, 628, 628, 628, 785, 785, 785]);
-	// Features of the forces applied to the nodes:
-	var simulation = d3.forceSimulation(data);
+		.domain(posMappings.map((d) => (d.data as Fragment).name) as Iterable<string>)
+		.range(['#8FBC8B', 'cornflowerblue', 'goldenrod', '#8E9ED1', '#C3B1E1', '#568203']);
+	const x = d3
+		.scaleOrdinal()
+		.domain(posMappings.map((d) => (d.data as Fragment).name) as Iterable<string>)
+		.range(posMappings.map((d) => d.x));
+	const y = d3
+		.scaleOrdinal()
+		.domain(posMappings.map((d) => (d.data as Fragment).name) as Iterable<string>)
+		.range(posMappings.map((d) => d.y));
 
-	// Apply these forces to the nodes and update their positions.
-	// Once the force algorithm is happy with positions ('alpha' value is low enough), simulations will stop.
+	const simulation = d3.forceSimulation(data);
+
 	$: simulation
 		.force(
 			'x',
 			d3
 				.forceX()
-				.strength(0.5)
-				.x((d) => x(d.group))
+				.strength(0.75)
+				.x((d) => x((d as d3.HierarchyNode<Fragment>).data.group.toString()) as number)
 		)
 		.force(
 			'y',
 			d3
 				.forceY()
-				.strength(0.5)
-				.y((d) => y(d.group))
+				.strength(0.75)
+				.y((d) => y((d as d3.HierarchyNode<Fragment>).data.group.toString()) as number)
 		)
-		.force('center', d3.forceCenter().x(500).y(500)) // Attraction to the center of the svg area
+		.force(
+			'center',
+			d3
+				.forceCenter()
+				.x(width / 2)
+				.y(height / 2)
+		) // Attraction to the center of the svg area
 		.force('charge', d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
 		.force(
 			'collide',
 			d3
 				.forceCollide()
-				.strength(0.2)
-				.radius((d) => d.size + 2)
+				.strength(0.4)
+				.radius((d) => (d as d3.HierarchyNode<Fragment>).r + 5)
 				.iterations(1)
 		); // Force that avoids circle overlapping
-
-	$: simulation.on('tick', update);
+	$: simulation.on('tick', () => (data = data));
 </script>
 
 <main>
-	<h1><i>Sappho</i> in Data</h1>
+	<header>
+		<h1><i>Sappho</i> in Data</h1>
+		<address><b>@yum25</b></address>
+	</header>
+
 	<div id="cluster">
-		<svg bind:this={svg} viewBox="0 0 1100 1100">
-			<!-- watercolor svg filter credits to https://observablehq.com/@veltman/watercolor -->
+		<svg bind:this={svg} viewBox="0 0 {width} {height}">
 			<defs>
 				<filter id="watercolor">
 					<feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="4" />
@@ -105,17 +98,57 @@
 				</filter>
 			</defs>
 
-			<g>
-				{#each displayData as datum}
+			<g transform="translate({margin} {margin})">
+				{#each data as fragment}
 					<g filter="url(#watercolor)">
-						<circle r={datum.size} fill={color(datum.group)} cx={datum.x} cy={datum.y}>
-							<text> 1 </text>
+						<circle
+							r={fragment.r}
+							fill={color(fragment.data.group)}
+							cx={fragment.x}
+							cy={fragment.y}
+						>
 						</circle>
-						<text x={datum.x} y={datum.y + 4} text-anchor="middle" fill="white"> 1 </text>
+						<text x={fragment.x} y={fragment.y + 4} text-anchor="middle" fill="white"
+							>{fragment.data.name}</text
+						>
 					</g>
 				{/each}
 			</g>
 		</svg>
+		<section>
+			<h2>Lorem Ipsum Dolor Sit</h2>
+			<p>
+				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
+				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
+				minus nisi quia deleniti!
+			</p>
+			<p>
+				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
+				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
+				minus nisi quia deleniti!
+			</p>
+			<p>
+				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
+				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
+				minus nisi quia deleniti!
+			</p>
+			<h2>Lorem Ipsum Dolor Sit</h2>
+			<p>
+				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
+				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
+				minus nisi quia deleniti!
+			</p>
+			<p>
+				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
+				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
+				minus nisi quia deleniti!
+			</p>
+			<p>
+				Lorem, ipsum dolor sit amet consectetur adipisicing elit. Rem et unde optio ducimus, dolorem
+				obcaecati saepe suscipit maiores incidunt neque quasi eveniet blanditiis odit dicta, ipsum
+				minus nisi quia deleniti!
+			</p>
+		</section>
 	</div>
 </main>
 
@@ -126,11 +159,37 @@
 		box-sizing: border-box;
 		padding: 5px;
 	}
+
+  header {
+    margin: 3rem;
+  }
 	h1 {
+		margin: 0;
+
 		font-size: 6rem;
 		font-weight: 300;
 
 		text-align: center;
 		text-transform: uppercase;
+	}
+	address {
+		font-size: 1.2rem;
+    font-style: normal;
+		text-align: center;
+	}
+
+	#cluster {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	#cluster > svg {
+		max-height: 100vh;
+		min-height: 60vh;
+	}
+
+	#cluster > section {
+		max-width: 30rem;
 	}
 </style>

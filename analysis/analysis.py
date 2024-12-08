@@ -1,6 +1,19 @@
 import re
+import copy
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
+
+def jaccard_similarity(setA, setB):
+    # intersection of two sets
+    intersection = len(setA.intersection(setB))
+    # Unions of two sets
+
+    union = len(setA.union(setB))
+
+    if union == 0:
+        return 0
+
+    return intersection / union
 
 def main():
     regex = re.compile('[^a-zA-Z]')
@@ -15,10 +28,13 @@ def main():
 
                 for line in lines:
                     for word in line.split(' '):
-                        cleaned = regex.sub('', word)
+                        
+                        cleaned = regex.sub('', word).lower()
 
                         if len(cleaned) > 0:
                             sets[i - 1].add(cleaned)
+
+                        
         except FileNotFoundError:
             print(f"Skipping {i}, continuing to next fragment...")
     
@@ -32,7 +48,7 @@ def main():
     
 
     # Create an instance of AgglomerativeClustering
-    clustering = AgglomerativeClustering(n_clusters=15, metric="precomputed", linkage='complete')
+    clustering = AgglomerativeClustering(n_clusters=16, metric="precomputed", linkage='complete')
 
     # Fit the model to the data
     clustering.fit(np.array(matrix))
@@ -50,34 +66,29 @@ def main():
                 clusters[label] = [i + 1]
             else:
                 clusters[label].append(i + 1)
-    
-    print(clusters)
 
-    with open('analysis/clusters.json', 'w') as f:
-        f.write(str(clusters))
+    i = 1
+    hierarchy = {}
+   
+    while (i < 153):
+        if i in ignore:
+            i += 1
+            continue
+
+        fragment = { "name": i, "group": int(labels[i - 1]), "size": len(sets[i - 1])}
+
+        if hierarchy.get(fragment["group"], None) == None:
+            hierarchy[fragment["group"]] = { "name": fragment["group"], "children": [fragment]}
+        else:
+            hierarchy[fragment["group"]]["children"].append(fragment)
+
+        i += 1
+
+    with open('analysis/hierarchy.json', 'w') as f:
+        hierarchy = {"name": "data", "children": list(hierarchy.values())} 
+        f.write(str(hierarchy))
 
 
-    wordsets = []
-    for i in range(0, len(sets)):
-        wordsets.append(list(sets[i]))
-
-    with open('analysis/sets.json', 'w') as f:
-        f.write(str(wordsets))
-
-    
-
-
-def jaccard_similarity(setA, setB):
-    # intersection of two sets
-    intersection = len(setA.intersection(setB))
-    # Unions of two sets
-
-    union = len(setA.union(setB))
-
-    if union == 0:
-        return 0
-
-    return intersection / union
 
 if __name__ == "__main__":
     main()
