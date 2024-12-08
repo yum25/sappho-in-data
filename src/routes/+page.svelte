@@ -13,6 +13,7 @@
 
 	let showHierarchy = false;
 	let onHoverNode: number = 0;
+	let ignoreNodes: number[] = [];
 
 	const pack = d3
 		.pack()
@@ -128,6 +129,8 @@
 				{#each data as fragment}
 					{@const r = onHoverNode == fragment.data.name ? 30 : fragment.r}
 					<g
+						class:fadein={!ignoreNodes.includes(fragment.data.name)}
+						class:fadeout={ignoreNodes.includes(fragment.data.name)}
 						filter="url(#watercolor)"
 						role="none"
 						on:mouseenter={() => {
@@ -147,7 +150,7 @@
 							y={fragment.y + 4}
 							text-anchor="middle"
 							fill="white"
-              font-size={r >= 30 ? 25: 15}
+							font-size={r >= 30 ? 25 : 15}
 							clip-path={`circle(${r})`}>{fragment.data.name}</text
 						>
 					</g>
@@ -183,11 +186,28 @@
 				These fragments are translated by <b>Anne Carson</b>, in her collection:
 				<i>If Not, Winter</i>.
 			</p>
+			<p style="margin-top: 3rem"><i>Scroll to start exploring! ↓ </i></p>
 		</section>
 	</div>
 </main>
 
 <style>
+	@keyframes opacity {
+		0% {
+			opacity: 0%;
+		}
+		100% {
+			opacity: 100%;
+		}
+	}
+
+	.fadein {
+		animation: opacity 1s linear forwards;
+	}
+
+	.fadeout {
+		animation: opacity 1s linear reverse forwards;
+	}
 	main {
 		font-family: 'Merriweather';
 
