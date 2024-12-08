@@ -6,9 +6,12 @@
 
 	let svg: SVGElement;
 
-	const height = 1100;
-	const width = 1100;
+  let innerHeight:number|undefined = undefined;
+	const height = (innerHeight ?? 900) + 200;
+	const width = (innerHeight ??  900) + 200;
 	const margin = 50;
+
+	let showHierarchy = false;
 
 	const pack = d3
 		.pack()
@@ -19,28 +22,41 @@
 		d3
 			.hierarchy(hierarchy as unknown)
 			.sum((d) => (d as Fragment).size)
-			.sort((a, b) => b.data.size - a.data.size)
+			.sort((a, b) => (b.value as number) - (a.value as number))
 	);
 
 	let packingData = root.descendants();
 
 	let data = packingData.filter((d) => d.depth == 2) as d3.HierarchyCircularNode<Fragment>[];
-	let posMappings = packingData.filter((d) => d.depth == 1);
-
-	console.log(root);
+	let clusters = packingData.filter((d) => d.depth == 1);
 
 	const color = d3
-		.scaleOrdinal()
-		.domain(posMappings.map((d) => (d.data as Fragment).name) as Iterable<string>)
-		.range(['#8FBC8B', 'cornflowerblue', 'goldenrod', '#8E9ED1', '#C3B1E1', '#568203']);
+		.scaleOrdinal<number, string>()
+		.domain(clusters.map((d) => (d.data as Fragment).name))
+		.range([
+			'#8FBC8B', // light green
+			'cornflowerblue',
+			'goldenrod',
+			'#8E9ED1',
+			'#C3B1E1',
+			'#568203',
+			'#5d6d7e',
+			'#5dade2',
+			'#5499c7',
+			'#4B6F44',
+			'#452c63',
+			'#5072A7',
+			'#3457D5'
+		]);
+
 	const x = d3
-		.scaleOrdinal()
-		.domain(posMappings.map((d) => (d.data as Fragment).name) as Iterable<string>)
-		.range(posMappings.map((d) => d.x));
+		.scaleOrdinal<number, number>()
+		.domain(clusters.map((d) => (d.data as Fragment).name))
+		.range(clusters.map((d) => d.x));
 	const y = d3
-		.scaleOrdinal()
-		.domain(posMappings.map((d) => (d.data as Fragment).name) as Iterable<string>)
-		.range(posMappings.map((d) => d.y));
+		.scaleOrdinal<number, number>()
+		.domain(clusters.map((d) => (d.data as Fragment).name))
+		.range(clusters.map((d) => d.y));
 
 	const simulation = d3.forceSimulation(data);
 
@@ -49,34 +65,29 @@
 			'x',
 			d3
 				.forceX()
-				.strength(0.75)
-				.x((d) => x((d as d3.HierarchyNode<Fragment>).data.group.toString()) as number)
+				.strength(0.01)
+				.x((d) => x((d as d3.HierarchyNode<Fragment>).data.group))
 		)
 		.force(
 			'y',
 			d3
 				.forceY()
-				.strength(0.75)
-				.y((d) => y((d as d3.HierarchyNode<Fragment>).data.group.toString()) as number)
+				.strength(0.01)
+				.y((d) => y((d as d3.HierarchyNode<Fragment>).data.group))
 		)
-		.force(
-			'center',
-			d3
-				.forceCenter()
-				.x(width / 2)
-				.y(height / 2)
-		) // Attraction to the center of the svg area
 		.force('charge', d3.forceManyBody().strength(1)) // Nodes are attracted one each other of value is > 0
 		.force(
 			'collide',
 			d3
 				.forceCollide()
-				.strength(0.4)
-				.radius((d) => (d as d3.HierarchyNode<Fragment>).r + 5)
+				.strength(0.1)
+				.radius((d) => (d as d3.HierarchyCircularNode<Fragment>).r + 1.5)
 				.iterations(1)
 		); // Force that avoids circle overlapping
 	$: simulation.on('tick', () => (data = data));
 </script>
+
+<svelte:window bind:innerHeight />
 
 <main>
 	<header>
@@ -99,6 +110,21 @@
 			</defs>
 
 			<g transform="translate({margin} {margin})">
+				{#if showHierarchy}
+					{#each clusters as cluster}
+						<circle
+							r={cluster.r}
+							cx={cluster.x}
+							cy={cluster.y}
+							fill="transparent"
+							stroke="black"
+							stroke-width="5"
+							stroke-opacity="0.85"
+						>
+						</circle>
+					{/each}
+				{/if}
+
 				{#each data as fragment}
 					<g filter="url(#watercolor)">
 						<circle
@@ -160,9 +186,9 @@
 		padding: 5px;
 	}
 
-  header {
-    margin: 3rem;
-  }
+	header {
+		margin: 3rem;
+	}
 	h1 {
 		margin: 0;
 
@@ -174,7 +200,7 @@
 	}
 	address {
 		font-size: 1.2rem;
-    font-style: normal;
+		font-style: normal;
 		text-align: center;
 	}
 
@@ -182,14 +208,17 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+
+    height: 100%;
+    width: 100%;
 	}
 
 	#cluster > svg {
 		max-height: 100vh;
-		min-height: 60vh;
+    min-height: 50rem;
 	}
 
 	#cluster > section {
-		max-width: 30rem;
+		max-width: 25rem;
 	}
 </style>

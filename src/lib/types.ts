@@ -1,5 +1,5 @@
 export type Fragment = {
-    name: string;
+    name: number;
     group: number;
     size: number;
 }
