@@ -17,10 +17,10 @@ def jaccard_similarity(setA, setB):
 
 def main():
     regex = re.compile('[^a-zA-Z]')
-    ignore = [10, 11, 13, 14, 28, 66, 72, 75, 77, 79, 89, 90, 97, 99, 139]
+    ignore = [10, 11, 13, 14, 28, 66, 72, 75, 77, 79, 89, 90, 97, 99, 139, 171, 178]
     sets = []
 
-    for i in range(1, 153):
+    for i in range(1, 193):
         sets.append(set())
         try:
             with open('analysis/fragments/f{0}.txt'.format(i), 'r') as file:
@@ -42,13 +42,13 @@ def main():
     for i in range(0, len(sets)):
         row = []
         for j in range(0, len(sets)):
-            row.append(1 - jaccard_similarity(sets[i], sets[j]))
+            row.append(jaccard_similarity(sets[i], sets[j]))
         
         matrix.append(row)
     
 
     # Create an instance of AgglomerativeClustering
-    clustering = AgglomerativeClustering(n_clusters=16, metric="precomputed", linkage='complete')
+    clustering = AgglomerativeClustering(n_clusters=15, linkage='ward')
 
     # Fit the model to the data
     clustering.fit(np.array(matrix))
@@ -70,7 +70,7 @@ def main():
     i = 1
     hierarchy = {}
    
-    while (i < 153):
+    while (i < 193):
         if i in ignore:
             i += 1
             continue
