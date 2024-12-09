@@ -173,7 +173,9 @@
 			class="scroll-step-container scroll-stack"
 			style="pointer-events: none;"
 		>
-			<div class="offset-svg" aria-hidden="true"></div>
+			<div class="offset-svg" aria-hidden="true">
+        <svg aria-hidden="true" viewBox="0 0 {width} {height}"></svg>
+      </div>
 			<div id="scroll-steps" style="transform: translateY(min(-90vh, -50rem));">
 				<section class="scroll-step">
 					<div class="scroll-step-content">
