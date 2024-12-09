@@ -5,14 +5,19 @@
 	import hierarchy from '$lib/analysis/hierarchy.json';
 	import { onMount } from 'svelte';
 
+	import scrollama from 'scrollama';
+
+	// instantiate the scrollama
+	const scroller = scrollama();
+
 	let svg: SVGElement;
 
 	let innerHeight: number;
 	let innerWidth: number;
 	let height: number;
 	let width: number;
-  let minR: number;
-	const margin = 50;
+	let minR: number;
+	const margin = 20;
 
 	let showHierarchy = false;
 	let onHoverNode: number = 0;
@@ -79,11 +84,9 @@
 	$: simulation.on('tick', () => (data = data));
 
 	onMount(() => {
-		height = (Math.max(innerHeight, innerWidth) ?? 900) + 200;
-		width = (Math.max(innerHeight, innerWidth) ?? 900) + 200;
-    minR = Math.round(height / 30);
-    console.log(height)
-    console.log(minR)
+		height = Math.max(Math.max(innerHeight, innerWidth), 1100);
+		width =  Math.max(Math.max(innerHeight, innerWidth), 1100);
+		minR = Math.round(height / 30);
 
 		const pack = d3
 			.pack()
@@ -98,6 +101,24 @@
 		);
 
 		packingData = root.descendants();
+
+		// setup the instance, pass callback functions
+		scroller
+			.setup({
+				step: '.step'
+			})
+			.onStepEnter((response) => {
+				// { element, index, direction }
+				if (response.index == 0) {
+					ignoreNodes = [1];
+				}
+			})
+			.onStepExit((response) => {
+				// { element, index, direction }
+				if (response.index == 0) {
+					ignoreNodes = [];
+				}
+			});
 	});
 </script>
 
@@ -110,67 +131,69 @@
 	</header>
 	<div class="scroll-container">
 		<div id="cluster" class="scroll-figure scroll-stack">
-			<svg bind:this={svg} viewBox="0 0 {width} {height}">
-				<defs>
-					<filter id="watercolor">
-						<feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="4" />
-						<feColorMatrix
-							values="0 0 0 0 0, 0 0 0 0 0, 0 0 0 0 0, 0 0 0 -0.9 1.2"
-							result="texture"
-						/>
-						<feComposite in="SourceGraphic" in2="texture" operator="in" />
-						<feGaussianBlur stdDeviation="0.5" />
-					</filter>
-				</defs>
+			{#if width && height}
+				<svg bind:this={svg} viewBox="0 0 {width} {height}">
+					<defs>
+						<filter id="watercolor">
+							<feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="4" />
+							<feColorMatrix
+								values="0 0 0 0 0, 0 0 0 0 0, 0 0 0 0 0, 0 0 0 -0.9 1.2"
+								result="texture"
+							/>
+							<feComposite in="SourceGraphic" in2="texture" operator="in" />
+							<feGaussianBlur stdDeviation="0.5" />
+						</filter>
+					</defs>
 
-				<g transform="translate({margin} {margin})">
-					{#if showHierarchy}
-						{#each clusters as cluster}
-							<circle
-								r={cluster.r}
-								cx={cluster.x}
-								cy={cluster.y}
-								fill="transparent"
-								stroke="black"
-								stroke-width="5"
-								stroke-opacity="0.85"
+					<g transform="translate({margin} {margin})">
+						{#if showHierarchy}
+							{#each clusters as cluster}
+								<circle
+									r={cluster.r}
+									cx={cluster.x}
+									cy={cluster.y}
+									fill="transparent"
+									stroke="black"
+									stroke-width="5"
+									stroke-opacity="0.85"
+								>
+								</circle>
+							{/each}
+						{/if}
+
+						{#each data as fragment}
+							{@const r = onHoverNode == fragment.data.name ? minR : fragment.r}
+							<g
+								class:fadein={!ignoreNodes.includes(fragment.data.name)}
+								class:fadeout={ignoreNodes.includes(fragment.data.name)}
+								filter="url(#watercolor)"
+								role="none"
+								on:mouseenter={() => {
+									if (fragment.r < minR) {
+										onHoverNode = fragment.data.name;
+									}
+								}}
+								on:mouseleave={() => {
+									if (fragment.r < minR) {
+										onHoverNode = 0;
+									}
+								}}
 							>
-							</circle>
+								<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y}>
+								</circle>
+								<text
+									x={fragment.x}
+									y={fragment.y + 4}
+									text-anchor="middle"
+									fill="white"
+									font-size={r >= minR ? 25 : 15}
+									clip-path={`circle(${r})`}>{fragment.data.name}</text
+								>
+							</g>
 						{/each}
-					{/if}
-
-					{#each data as fragment}
-						{@const r = onHoverNode == fragment.data.name ? minR : fragment.r}
-						<g
-							class:fadein={!ignoreNodes.includes(fragment.data.name)}
-							class:fadeout={ignoreNodes.includes(fragment.data.name)}
-							filter="url(#watercolor)"
-							role="none"
-							on:mouseenter={() => {
-								if (fragment.r < minR) {
-									onHoverNode = fragment.data.name;
-								}
-							}}
-							on:mouseleave={() => {
-								if (fragment.r < minR) {
-									onHoverNode = 0;
-								}
-							}}
-						>
-							<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y}>
-							</circle>
-							<text
-								x={fragment.x}
-								y={fragment.y + 4}
-								text-anchor="middle"
-								fill="white"
-								font-size={r >= minR ? 25 : 15}
-								clip-path={`circle(${r})`}>{fragment.data.name}</text
-							>
-						</g>
-					{/each}
-				</g>
-			</svg>
+					</g>
+				</svg>
+			{/if}
 			<section class="offset-step" aria-hidden="true"></section>
 		</div>
 		<div
@@ -228,8 +251,15 @@
 						</p>
 						<p style="margin-top: 3rem;">
 							It can be a bit difficult to see some of the shorter fragments. To read the fragment
-							number, <span style="text-decoration: underline;">hover over the smaller fragments to enlarge them!</span>
+							number, <span style="text-decoration: underline;"
+								>hover over the smaller fragments to enlarge them!</span
+							>
 						</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>First, let's look at some of the largest groupings and smallest groupings.</p>
 					</div>
 				</section>
 			</div>
@@ -238,7 +268,7 @@
 </main>
 
 <style>
-	@keyframes opacity {
+	@keyframes fadein {
 		0% {
 			opacity: 0%;
 		}
@@ -247,12 +277,21 @@
 		}
 	}
 
+  @keyframes fadeout {
+    0% {
+			opacity: 100%;
+		}
+		100% {
+			opacity: 0%;
+		}
+  }
+
 	.fadein {
-		animation: opacity 1s linear forwards;
+		animation: fadein 1s linear forwards;
 	}
 
 	.fadeout {
-		animation: opacity 1s linear reverse forwards;
+		animation: fadeout 1s linear forwards;
 	}
 	main {
 		font-family: 'Merriweather';
