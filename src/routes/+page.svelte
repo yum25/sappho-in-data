@@ -115,7 +115,7 @@
 			})
 			.onStepExit((response) => {
 				// { element, index, direction }
-				if (response.index == 0 && response.direction == "up") {
+				if (response.index == 0 && response.direction == 'up') {
 					ignoreNodes = [];
 				}
 			});
@@ -166,7 +166,6 @@
 								class:fadein={!ignoreNodes.includes(fragment.data.name)}
 								class:fadeout={ignoreNodes.includes(fragment.data.name)}
 								filter="url(#watercolor)"
-								shape-rendering="crispEdges"
 								role="none"
 								on:mouseenter={() => {
 									if (fragment.r < minR) {
@@ -184,19 +183,30 @@
 									fill={color(fragment.data.group)}
 									cx={fragment.x}
 									cy={fragment.y}
-									shape-rendering="crispEdges"
 								>
 								</circle>
 							</g>
 							<text
+								role="none"
+								fill="white"
+								text-anchor="middle"
+								font-size={r >= minR ? 30 : 15}
+								clip-path={`circle(${r})`}
 								x={fragment.x}
 								y={fragment.y + 5}
-								text-anchor="middle"
-								fill="white"
-								shape-rendering="crispEdges"
-								font-size={r >= minR ? 30 : 15}
-								clip-path={`circle(${r})`}>{fragment.data.name}</text
+								on:mouseenter={() => {
+									if (fragment.r < minR) {
+										onHoverNode = fragment.data.name;
+									}
+								}}
+								on:mouseleave={() => {
+									if (fragment.r < minR) {
+										onHoverNode = 0;
+									}
+								}}
 							>
+								{fragment.data.name}
+							</text>
 						{/each}
 					</g>
 				</svg>
