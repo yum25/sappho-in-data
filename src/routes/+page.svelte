@@ -364,7 +364,7 @@
 	}
 
 	.offset-svg {
-		width: min(100%, 50rem);
+		min-width: 50rem;
 		pointer-events: none;
 	}
 
@@ -372,10 +372,11 @@
 		width: min(100%, 30rem);
 	}
 
-	@media screen and (max-width: 1100px) {
+	@media screen and (max-width: 1200px) {
 		.offset-svg,
 		.offset-step {
 			width: 0;
+      min-width: 0;
 		}
 	}
 
