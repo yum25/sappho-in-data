@@ -170,7 +170,7 @@
 		</div>
 		<div
 			class="scroll-step-container scroll-stack"
-			style="transform: translateY(-90vh); pointer-events: none;"
+			style="pointer-events: none;"
 		>
 			<div class="offset-svg" aria-hidden="true"></div>
 			<div id="scroll-steps">
@@ -311,8 +311,8 @@
 	}
 
 	#cluster > svg {
-		max-height: 100vh;
-		min-height: 50rem;
+		height: 100vh;
+    min-height: 50rem;
 		min-width: min(50rem, 100%);
 	}
 
@@ -328,6 +328,8 @@
 		position: sticky;
 		top: 0;
 		margin: 0;
+
+    height: 100vh;
 
 		z-index: 0;
 	}
