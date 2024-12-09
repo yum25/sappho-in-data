@@ -8,6 +8,7 @@
 	let svg: SVGElement;
 
 	let innerHeight: number;
+  let innerWidth: number;
   let height:number;
   let width:number;
   const margin = 50;
@@ -77,8 +78,8 @@
 	$: simulation.on('tick', () => (data = data));
 
 	onMount(() => {
-		height = (innerHeight ?? 900) + 200;
-		width = (innerHeight ?? 900) + 200;
+		height = (Math.max(innerHeight, innerWidth) ?? 900) + 200;
+		width = (Math.max(innerHeight, innerWidth) ?? 900) + 200;
 
 		const pack = d3
 			.pack()
@@ -96,7 +97,7 @@
 	});
 </script>
 
-<svelte:window bind:innerHeight />
+<svelte:window bind:innerHeight bind:innerWidth />
 
 <main>
 	<header>
@@ -173,7 +174,7 @@
 			style="pointer-events: none;"
 		>
 			<div class="offset-svg" aria-hidden="true"></div>
-			<div id="scroll-steps">
+			<div id="scroll-steps" style="transform: translateY(min(-90vh, -50rem));">
 				<section class="scroll-step">
 					<div class="scroll-step-content">
 						<h2>Categorizing Sappho</h2>
@@ -342,8 +343,10 @@
 	}
 
 	.scroll-step {
-		min-height: 100vh;
-		min-height: 100svh;
+		height: 100vh;
+		height: 100svh;
+
+    min-height: 50rem;
 
 		max-width: 25rem;
 
