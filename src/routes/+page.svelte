@@ -84,8 +84,8 @@
 	$: simulation.on('tick', () => (data = data));
 
 	onMount(() => {
-		height = 1100
-		width = 1100
+		height = 1100;
+		width = 1100;
 		minR = Math.round(height / 30);
 
 		const pack = d3
@@ -109,13 +109,13 @@
 			})
 			.onStepEnter((response) => {
 				// { element, index, direction }
-				if (response.index == 0) {
+				if (response.index < 2) {
 					ignoreNodes = [1];
 				}
 			})
 			.onStepExit((response) => {
 				// { element, index, direction }
-				if (response.index == 0) {
+				if (response.index == 0 && response.direction == "up") {
 					ignoreNodes = [];
 				}
 			});
@@ -141,7 +141,6 @@
 								result="texture"
 							/>
 							<feComposite in="SourceGraphic" in2="texture" operator="in" />
-							<feGaussianBlur stdDeviation="0.5" />
 						</filter>
 					</defs>
 
@@ -191,11 +190,11 @@
 							</g>
 							<text
 								x={fragment.x}
-								y={fragment.y + 4}
+								y={fragment.y + 5}
 								text-anchor="middle"
 								fill="white"
 								shape-rendering="crispEdges"
-								font-size={r >= minR ? 25 : 15}
+								font-size={r >= minR ? 30 : 15}
 								clip-path={`circle(${r})`}>{fragment.data.name}</text
 							>
 						{/each}
@@ -268,6 +267,19 @@
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
 						<p>First, let's look at some of the largest groupings and smallest groupings.</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>
+							Interestingly, the algorithm used to group the fragments seems to have generally
+							associated fragments of similar length together.
+						</p>
+						<p>
+							Larger fragments also have more "gravity" - the longer they are, the more words they
+							have, and the more words there are, the more likely the algorithm will find word
+							similarities between fragments.
+						</p>
 					</div>
 				</section>
 			</div>
