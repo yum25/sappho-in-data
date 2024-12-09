@@ -84,8 +84,8 @@
 	$: simulation.on('tick', () => (data = data));
 
 	onMount(() => {
-		height = Math.max(Math.max(innerHeight, innerWidth), 1100);
-		width =  Math.max(Math.max(innerHeight, innerWidth), 1100);
+		height = 1100
+		width = 1100
 		minR = Math.round(height / 30);
 
 		const pack = d3
@@ -167,7 +167,7 @@
 								class:fadein={!ignoreNodes.includes(fragment.data.name)}
 								class:fadeout={ignoreNodes.includes(fragment.data.name)}
 								filter="url(#watercolor)"
-                shape-rendering="crispEdges"
+								shape-rendering="crispEdges"
 								role="none"
 								on:mouseenter={() => {
 									if (fragment.r < minR) {
@@ -180,18 +180,24 @@
 									}
 								}}
 							>
-								<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y} shape-rendering="crispEdges">
-								</circle>
-								<text
-									x={fragment.x}
-									y={fragment.y + 4}
-									text-anchor="middle"
-									fill="white"
-                  shape-rendering="crispEdges"
-									font-size={r >= minR ? 25 : 15}
-									clip-path={`circle(${r})`}>{fragment.data.name}</text
+								<circle
+									{r}
+									fill={color(fragment.data.group)}
+									cx={fragment.x}
+									cy={fragment.y}
+									shape-rendering="crispEdges"
 								>
+								</circle>
 							</g>
+							<text
+								x={fragment.x}
+								y={fragment.y + 4}
+								text-anchor="middle"
+								fill="white"
+								shape-rendering="crispEdges"
+								font-size={r >= minR ? 25 : 15}
+								clip-path={`circle(${r})`}>{fragment.data.name}</text
+							>
 						{/each}
 					</g>
 				</svg>
@@ -279,14 +285,14 @@
 		}
 	}
 
-  @keyframes fadeout {
-    0% {
+	@keyframes fadeout {
+		0% {
 			opacity: 100%;
 		}
 		100% {
 			opacity: 0%;
 		}
-  }
+	}
 
 	.fadein {
 		animation: fadein 1s linear forwards;
