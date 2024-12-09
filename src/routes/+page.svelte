@@ -171,7 +171,7 @@
 		</div>
 		<div
 			class="scroll-step-container scroll-stack"
-			style="pointer-events: none;"
+			style="pointer-events: none; transform: translateY(min(-80vh, -50rem))"
 		>
 			<div class="offset-svg" aria-hidden="true">
       </div>
