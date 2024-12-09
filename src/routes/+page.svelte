@@ -8,16 +8,17 @@
 	let svg: SVGElement;
 
 	let innerHeight: number;
-  let innerWidth: number;
-  let height:number;
-  let width:number;
-  const margin = 50;
-  
+	let innerWidth: number;
+	let height: number;
+	let width: number;
+  let minR: number;
+	const margin = 50;
+
 	let showHierarchy = false;
 	let onHoverNode: number = 0;
 	let ignoreNodes: number[] = [];
 
-  let packingData:d3.HierarchyCircularNode<unknown>[] = []
+	let packingData: d3.HierarchyCircularNode<unknown>[] = [];
 
 	$: data = packingData.filter((d) => d.depth == 2) as d3.HierarchyCircularNode<Fragment>[];
 	$: clusters = packingData.filter((d) => d.depth == 1);
@@ -80,6 +81,9 @@
 	onMount(() => {
 		height = (Math.max(innerHeight, innerWidth) ?? 900) + 200;
 		width = (Math.max(innerHeight, innerWidth) ?? 900) + 200;
+    minR = Math.round(height / 30);
+    console.log(height)
+    console.log(minR)
 
 		const pack = d3
 			.pack()
@@ -93,7 +97,7 @@
 				.sort((a, b) => (b.value as number) - (a.value as number))
 		);
 
-    packingData = root.descendants();
+		packingData = root.descendants();
 	});
 </script>
 
@@ -136,19 +140,19 @@
 					{/if}
 
 					{#each data as fragment}
-						{@const r = onHoverNode == fragment.data.name ? 30 : fragment.r}
+						{@const r = onHoverNode == fragment.data.name ? minR : fragment.r}
 						<g
 							class:fadein={!ignoreNodes.includes(fragment.data.name)}
 							class:fadeout={ignoreNodes.includes(fragment.data.name)}
 							filter="url(#watercolor)"
 							role="none"
 							on:mouseenter={() => {
-								if (fragment.r < 30) {
+								if (fragment.r < minR) {
 									onHoverNode = fragment.data.name;
 								}
 							}}
 							on:mouseleave={() => {
-								if (fragment.r < 30) {
+								if (fragment.r < minR) {
 									onHoverNode = 0;
 								}
 							}}
@@ -160,7 +164,7 @@
 								y={fragment.y + 4}
 								text-anchor="middle"
 								fill="white"
-								font-size={r >= 30 ? 25 : 15}
+								font-size={r >= minR ? 25 : 15}
 								clip-path={`circle(${r})`}>{fragment.data.name}</text
 							>
 						</g>
@@ -171,11 +175,10 @@
 		</div>
 		<div
 			class="scroll-step-container scroll-stack"
-			style="pointer-events: none; transform: translateY(min(-80vh, -50rem))"
+			style="pointer-events: none; transform: translateY(min(-100vh, -50rem))"
 		>
-			<div class="offset-svg" aria-hidden="true">
-      </div>
-			<div id="scroll-steps" >
+			<div class="offset-svg" aria-hidden="true"></div>
+			<div id="scroll-steps">
 				<section class="scroll-step">
 					<div class="scroll-step-content">
 						<h2>Categorizing Sappho</h2>
@@ -213,38 +216,21 @@
 					</div>
 				</section>
 				<section class="scroll-step">
-					<h2>Categorizing Sappho</h2>
-					<p>
-						The literary corpus of Sappho is rife with references to mortals and gods alike -
-						<span style="background: lightpink;">Aphrodite</span>, Gonglya, Atthis, and brimming
-						with descriptions of
-						<span style="background: rgb(129, 194, 129);">beauty</span> and
-						<span style="background: lavender;">nature</span>.
-					</p>
-					<p>
-						The strong thematic similarity between poems, both in who they invoke and what they
-						describe makes Sappho's fragments an especially interesting subject to place in distinct
-						categories. I wondered: what if I tried to group these poems using a machine learning
-						algorithm?
-					</p>
-					<p>
-						Through measuring the <span style="text-decoration: underline;"
-							>number of words in common between fragments</span
-						>
-						and a little bit of math, I created a data visualization where each distinct
-						<b>grouping</b>
-						is repesented with a different <b style="color: blue;">color</b> compared to those around
-						it.
-					</p>
-					<div style="margin: 2rem 0rem;">
-						<input type="checkbox" id="hierarchy" bind:checked={showHierarchy} />
-						<label for="hierarchy"><b>See distinct fragment groupings</b></label>
+					<div class="scroll-step-content">
+						<p>Each circle represents a <b>fragment</b>.</p>
+						<p>
+							The number on each circle represents the <b>fragment number</b>.
+						</p>
+						<p>
+							The size of the circle represents the approximate length of the fragment. That means
+							if a fragment is longer, its circle will be <big>bigger</big>, and if a fragment is
+							shorter, its circle will be <small>smaller</small>.
+						</p>
+						<p style="margin-top: 3rem;">
+							It can be a bit difficult to see some of the shorter fragments. To read the fragment
+							number, <span style="text-decoration: underline;">hover over the smaller fragments to enlarge them!</span>
+						</p>
 					</div>
-					<p style="margin-top: 2rem;">
-						These fragments are translated by <b>Anne Carson</b>, in her collection:
-						<i>If Not, Winter</i>.
-					</p>
-					<p style="margin-top: 3rem"><i>Scroll to start exploring! ↓ </i></p>
 				</section>
 			</div>
 		</div>
@@ -314,7 +300,7 @@
 
 	#cluster > svg {
 		height: 100vh;
-    min-height: 50rem;
+		min-height: 50rem;
 		min-width: min(50rem, 100%);
 	}
 
@@ -331,7 +317,7 @@
 		top: 0;
 		margin: 0;
 
-    height: 100vh;
+		height: 100vh;
 
 		z-index: 0;
 	}
@@ -340,22 +326,26 @@
 		z-index: 1;
 		display: flex;
 		justify-content: center;
-    align-items: flex-start;
+		align-items: flex-start;
 	}
 
 	.scroll-step {
 		height: 100vh;
 		height: 100svh;
-    min-height: 50rem;
+		min-height: 50rem;
 
 		max-width: 25rem;
-		pointer-events: all;
+
+		display: grid;
+		place-items: center;
 	}
 
 	.scroll-step-content {
 		background: rgba(255, 255, 255, 0.6);
 		padding: 15px;
 		box-sizing: border-box;
+
+		pointer-events: all;
 	}
 
 	.scroll-stack {
