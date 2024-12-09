@@ -174,9 +174,8 @@
 			style="pointer-events: none;"
 		>
 			<div class="offset-svg" aria-hidden="true">
-        <svg aria-hidden="true" viewBox="0 0 {width} {height}"></svg>
       </div>
-			<div id="scroll-steps" style="transform: translateY(min(-90vh, -50rem));">
+			<div id="scroll-steps" >
 				<section class="scroll-step">
 					<div class="scroll-step-content">
 						<h2>Categorizing Sappho</h2>
@@ -341,17 +340,15 @@
 		z-index: 1;
 		display: flex;
 		justify-content: center;
-		align-items: center;
+    align-items: flex-start;
 	}
 
 	.scroll-step {
 		height: 100vh;
 		height: 100svh;
-
     min-height: 50rem;
 
 		max-width: 25rem;
-
 		pointer-events: all;
 	}
 
@@ -366,7 +363,7 @@
 	}
 
 	.offset-svg {
-		min-width: 50rem;
+		width: min(100%, 50rem);
 		pointer-events: none;
 	}
 
@@ -378,7 +375,6 @@
 		.offset-svg,
 		.offset-step {
 			width: 0;
-      min-width: 0;
 		}
 	}
 
