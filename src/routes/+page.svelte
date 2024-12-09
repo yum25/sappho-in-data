@@ -167,6 +167,7 @@
 								class:fadein={!ignoreNodes.includes(fragment.data.name)}
 								class:fadeout={ignoreNodes.includes(fragment.data.name)}
 								filter="url(#watercolor)"
+                shape-rendering="crispEdges"
 								role="none"
 								on:mouseenter={() => {
 									if (fragment.r < minR) {
@@ -179,13 +180,14 @@
 									}
 								}}
 							>
-								<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y}>
+								<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y} shape-rendering="crispEdges">
 								</circle>
 								<text
 									x={fragment.x}
 									y={fragment.y + 4}
 									text-anchor="middle"
 									fill="white"
+                  shape-rendering="crispEdges"
 									font-size={r >= minR ? 25 : 15}
 									clip-path={`circle(${r})`}>{fragment.data.name}</text
 								>
