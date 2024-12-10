@@ -109,8 +109,31 @@
 			})
 			.onStepEnter((response) => {
 				// { element, index, direction }
-				if (response.index < 2) {
-					ignoreNodes = [1];
+				if (response.index == 0 || response.index == 1) {
+					const [anchor1] = data.filter((d) => d.data.name == 1);
+					const [anchor2] = data.filter((d) => d.data.name == 123);
+
+					ignoreNodes = data
+						.filter(
+							(d) => !(d.data.group == anchor1.data.group) && !(d.data.group == anchor2.data.group)
+						)
+						.map((d) => d.data.name);
+				} else if (response.index == 2) {
+					const [anchor2] = data.filter((d) => d.data.name == 123);
+
+					const includeNodes = [1, 16, 31];
+
+					ignoreNodes = data
+						.filter(
+							(d) => !includeNodes.includes(d.data.name) && !(d.data.group == anchor2.data.group)
+						)
+						.map((d) => d.data.name);
+				} else if (response.index == 3) {
+					const [anchor2] = data.filter((d) => d.data.name == 123);
+
+					ignoreNodes = data
+						.filter((d) => !(d.data.group == anchor2.data.group))
+						.map((d) => d.data.name);
 				}
 			})
 			.onStepExit((response) => {
@@ -178,12 +201,7 @@
 									}
 								}}
 							>
-								<circle
-									{r}
-									fill={color(fragment.data.group)}
-									cx={fragment.x}
-									cy={fragment.y}
-								>
+								<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y}>
 								</circle>
 							</g>
 							<text
@@ -215,7 +233,7 @@
 		</div>
 		<div
 			class="scroll-step-container scroll-stack"
-			style="pointer-events: none; transform: translateY(min(-100vh, -50rem))"
+			style="pointer-events: none; margin-top: min(-100vh, -50rem)"
 		>
 			<div class="offset-svg" aria-hidden="true"></div>
 			<div id="scroll-steps">
@@ -276,7 +294,7 @@
 				</section>
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
-						<p>First, let's look at some of the largest groupings and smallest groupings.</p>
+						<p>First, let's look at some of the largest and smallest groupings.</p>
 					</div>
 				</section>
 				<section class="scroll-step step">
@@ -292,6 +310,48 @@
 						</p>
 					</div>
 				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>
+							Notably, some of Sappho's most well known and frequently translated fragments are
+							grouped together, such as the Ode to Aphrodite (Fragment 1), Fragment 16, and Fragment
+							31.
+						</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p style="margin-bottom: 2rem;">
+							The smallest cluster is made up of 3 short fragments.
+						</p>
+						<div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+							<p style="margin: 0;">
+								<b>Fragment 123</b>
+								<br />
+								just now goldsandaled Dawn
+							</p>
+							<p style="margin: 0;">
+								<b>Fragment 157</b>
+								<br />
+								lady Dawn
+							</p>
+							<p style="margin: 0;">
+								<b>Fragment 175</b>
+								<br />
+								dawn
+							</p>
+						</div>
+						<p style="margin-top: 2rem;">
+							All mentioning dawn. Interesting! Let's see what other fragments have the word "dawn"
+							in them...
+						</p>
+					</div>
+				</section>
+        <section class="scroll-step step">
+          <div class="scroll-step-content">
+            <p>dawn</p>
+          </div>
+        </section>
 			</div>
 		</div>
 	</div>
@@ -385,8 +445,6 @@
 		position: sticky;
 		top: 0;
 		margin: 0;
-
-		height: 100vh;
 
 		z-index: 0;
 	}
