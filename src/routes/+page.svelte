@@ -8,7 +8,7 @@
 
 	import scrollama from 'scrollama';
 
-  const sets:Record<number, string[]> = setsjson;
+	const sets: Record<number, string[]> = setsjson;
 
 	const scroller = scrollama();
 
@@ -167,8 +167,8 @@
 						.filter(
 							(d) =>
 								!sets[d.data.name].includes('moon') &&
-                !sets[d.data.name].includes('silver') &&
-                !sets[d.data.name].includes('silvery')
+								!sets[d.data.name].includes('silver') &&
+								!sets[d.data.name].includes('silvery')
 						)
 						.map((d) => d.data.name);
 				}
@@ -225,43 +225,46 @@
 							<g
 								class:fadein={!ignoreNodes.includes(fragment.data.name)}
 								class:fadeout={ignoreNodes.includes(fragment.data.name)}
-								filter="url(#watercolor)"
-								role="none"
-								on:mouseenter={() => {
-									if (fragment.r < minR) {
-										onHoverNode = fragment.data.name;
-									}
-								}}
-								on:mouseleave={() => {
-									if (fragment.r < minR) {
-										onHoverNode = 0;
-									}
-								}}
 							>
-								<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y}>
-								</circle>
+								<g
+									filter="url(#watercolor)"
+									role="none"
+									on:mouseenter={() => {
+										if (fragment.r < minR) {
+											onHoverNode = fragment.data.name;
+										}
+									}}
+									on:mouseleave={() => {
+										if (fragment.r < minR) {
+											onHoverNode = 0;
+										}
+									}}
+								>
+									<circle {r} fill={color(fragment.data.group)} cx={fragment.x} cy={fragment.y}>
+									</circle>
+								</g>
+								<text
+									role="none"
+									fill="white"
+									text-anchor="middle"
+									font-size={r >= minR ? 30 : 15}
+									clip-path={`circle(${r})`}
+									x={fragment.x}
+									y={fragment.y + 5}
+									on:mouseenter={() => {
+										if (fragment.r < minR) {
+											onHoverNode = fragment.data.name;
+										}
+									}}
+									on:mouseleave={() => {
+										if (fragment.r < minR) {
+											onHoverNode = 0;
+										}
+									}}
+								>
+									{fragment.data.name}
+								</text>
 							</g>
-							<text
-								role="none"
-								fill="white"
-								text-anchor="middle"
-								font-size={r >= minR ? 30 : 15}
-								clip-path={`circle(${r})`}
-								x={fragment.x}
-								y={fragment.y + 5}
-								on:mouseenter={() => {
-									if (fragment.r < minR) {
-										onHoverNode = fragment.data.name;
-									}
-								}}
-								on:mouseleave={() => {
-									if (fragment.r < minR) {
-										onHoverNode = 0;
-									}
-								}}
-							>
-								{fragment.data.name}
-							</text>
 						{/each}
 					</g>
 				</svg>
@@ -404,7 +407,7 @@
 						<p>gold, golden, goldhaired, goldsandaled</p>
 					</div>
 				</section>
-        <section class="scroll-step step">
+				<section class="scroll-step step">
 					<div class="scroll-step-content">
 						<p>moon, silver, silvery</p>
 					</div>
