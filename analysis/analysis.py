@@ -88,6 +88,14 @@ def main():
         hierarchy = {"name": "data", "children": list(hierarchy.values())} 
         f.write(str(hierarchy))
 
+    sets_dict = {}
+    for i in range(0, len(sets)):
+        if i+1 not in ignore:
+            sets_dict[i+1] = list(sets[i])
+
+    with open('analysis/sets.json', 'w') as f:
+        f.write(str(sets_dict))
+
 
 
 if __name__ == "__main__":

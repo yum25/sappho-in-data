@@ -3,15 +3,16 @@
 
 	import type { Fragment } from '$lib/types';
 	import hierarchy from '$lib/analysis/hierarchy.json';
+	import setsjson from '$lib/analysis/sets.json';
 	import { onMount } from 'svelte';
 
 	import scrollama from 'scrollama';
 
-	// instantiate the scrollama
+  const sets:Record<number, string[]> = setsjson;
+
 	const scroller = scrollama();
 
 	let svg: SVGElement;
-
 	let innerHeight: number;
 	let innerWidth: number;
 	let height: number;
@@ -133,6 +134,42 @@
 
 					ignoreNodes = data
 						.filter((d) => !(d.data.group == anchor2.data.group))
+						.map((d) => d.data.name);
+				} else if (response.index == 4) {
+					ignoreNodes = data
+						.filter((d) => !sets[d.data.name].includes('dawn'))
+						.map((d) => d.data.name);
+				} else if (response.index == 5) {
+					ignoreNodes = data
+						.filter(
+							(d) =>
+								!sets[d.data.name].includes('aphrodite') &&
+								!sets[d.data.name].includes('kypris') &&
+								!sets[d.data.name].includes('kypros')
+						)
+						.map((d) => d.data.name);
+				} else if (response.index == 6) {
+					ignoreNodes = data
+						.filter((d) => !sets[d.data.name].includes('eros'))
+						.map((d) => d.data.name);
+				} else if (response.index == 7) {
+					ignoreNodes = data
+						.filter(
+							(d) =>
+								!sets[d.data.name].includes('gold') &&
+								!sets[d.data.name].includes('golden') &&
+								!sets[d.data.name].includes('goldhaired') &&
+								!sets[d.data.name].includes('goldsandaled')
+						)
+						.map((d) => d.data.name);
+				} else if (response.index == 8) {
+					ignoreNodes = data
+						.filter(
+							(d) =>
+								!sets[d.data.name].includes('moon') &&
+                !sets[d.data.name].includes('silver') &&
+                !sets[d.data.name].includes('silvery')
+						)
 						.map((d) => d.data.name);
 				}
 			})
@@ -347,11 +384,31 @@
 						</p>
 					</div>
 				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>dawn</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>Aphrodite, Kypris, Kypros</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>Eros</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>gold, golden, goldhaired, goldsandaled</p>
+					</div>
+				</section>
         <section class="scroll-step step">
-          <div class="scroll-step-content">
-            <p>dawn</p>
-          </div>
-        </section>
+					<div class="scroll-step-content">
+						<p>moon, silver, silvery</p>
+					</div>
+				</section>
 			</div>
 		</div>
 	</div>
