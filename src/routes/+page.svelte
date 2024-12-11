@@ -26,8 +26,18 @@
 
 	let filterInput: HTMLTextAreaElement;
 	let inputList: string = '';
+  let filter = false;
 
 	let packingData: d3.HierarchyCircularNode<unknown>[] = [];
+
+  $: {
+    if (filter && inputList.length > 0) {
+      const inputs = inputList.split(',').map((d) => d.trim().toLowerCase());
+      const hasntWord = (d:Fragment) => inputs.reduce((prev, input) => prev && !sets[d.name].includes(input), true)
+
+      ignoreNodes = data.filter((d) => hasntWord(d.data)).map((d) => d.data.name);
+    }
+  }
 
 	$: data = packingData.filter((d) => d.depth == 2) as d3.HierarchyCircularNode<Fragment>[];
 	$: clusters = packingData.filter((d) => d.depth == 1);
@@ -114,7 +124,7 @@
 			})
 			.onStepEnter((response) => {
 				// { element, index, direction }
-				if (response.index == 0 || response.index == 1) {
+				if (response.index === 0 || response.index === 1) {
 					const [anchor1] = data.filter((d) => d.data.name == 1);
 					const [anchor2] = data.filter((d) => d.data.name == 123);
 
@@ -123,7 +133,7 @@
 							(d) => !(d.data.group == anchor1.data.group) && !(d.data.group == anchor2.data.group)
 						)
 						.map((d) => d.data.name);
-				} else if (response.index == 2) {
+				} else if (response.index === 2) {
 					const [anchor2] = data.filter((d) => d.data.name == 123);
 
 					const includeNodes = [1, 16, 31];
@@ -133,17 +143,17 @@
 							(d) => !includeNodes.includes(d.data.name) && !(d.data.group == anchor2.data.group)
 						)
 						.map((d) => d.data.name);
-				} else if (response.index == 3) {
+				} else if (response.index === 3) {
 					const [anchor2] = data.filter((d) => d.data.name == 123);
 
 					ignoreNodes = data
 						.filter((d) => !(d.data.group == anchor2.data.group))
 						.map((d) => d.data.name);
-				} else if (response.index == 4) {
+				} else if (response.index === 4) {
 					ignoreNodes = data
 						.filter((d) => !sets[d.data.name].includes('dawn'))
 						.map((d) => d.data.name);
-				} else if (response.index == 5) {
+				} else if (response.index === 5) {
 					ignoreNodes = data
 						.filter(
 							(d) =>
@@ -152,11 +162,11 @@
 								!sets[d.data.name].includes('kypros')
 						)
 						.map((d) => d.data.name);
-				} else if (response.index == 6) {
+				} else if (response.index === 6) {
 					ignoreNodes = data
 						.filter((d) => !sets[d.data.name].includes('eros'))
 						.map((d) => d.data.name);
-				} else if (response.index == 7) {
+				} else if (response.index === 7) {
 					ignoreNodes = data
 						.filter(
 							(d) =>
@@ -166,7 +176,7 @@
 								!sets[d.data.name].includes('goldsandaled')
 						)
 						.map((d) => d.data.name);
-				} else if (response.index == 8) {
+				} else if (response.index === 8) {
 					ignoreNodes = data
 						.filter(
 							(d) =>
@@ -175,15 +185,19 @@
 								!sets[d.data.name].includes('silvery')
 						)
 						.map((d) => d.data.name);
-				} else if (response.index == 9) {
+				} else if (response.index === 9) {
 					ignoreNodes = [];
-				}
+				} else if (response.index === 10) {
+          filter = true;
+        }
 			})
 			.onStepExit((response) => {
 				// { element, index, direction }
-				if (response.index == 0 && response.direction == 'up') {
+				if (response.index === 0 && response.direction === 'up') {
 					ignoreNodes = [];
-				}
+				} else if (response.index === 10) {
+          filter = false;
+        }
 			});
 	});
 </script>
@@ -346,11 +360,11 @@
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
 						<p>
-							Interestingly, the algorithm used to group the fragments seems to have generally
-							associated fragments of similar length together.
+							The algorithm used to group the fragments generally
+							associated fragments of similar lengths together.
 						</p>
 						<p>
-							Larger fragments also have more <b><i>"gravity"</i></b> - the longer they are, the more
+							This makes sense - larger fragments have more <b><i>"gravity"</i></b> - the longer they are, the more
 							words they have, and the more words there are, the more likely the algorithm will find
 							word similarities between fragments.
 						</p>
@@ -515,7 +529,7 @@
 							</span> showed up in disparate categories.
 						</p>
 						<p>
-							Perhaps instead of a subject of Sappho's poems, <span
+							Perhaps instead of being a subject of Sappho's poems, <span
 								style="background: -webkit-linear-gradient(left, #0071c5, #ADD8E6, #5A4FCF);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;"
@@ -547,6 +561,14 @@
 						</p>
 					</div>
 				</section>
+        <section>
+          <div class="scroll-step-content" style="text-align: center;"> 
+            <small>
+              <p>Like what you see?<br/> <a style="color: inherit;" href="https://yum25.github.io">Check out my other work! :)</a></p>
+            </small>
+            
+          </div>
+        </section>
 			</div>
 		</div>
 	</div>
