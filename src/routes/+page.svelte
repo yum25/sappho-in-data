@@ -302,7 +302,7 @@
 						<h2>Categorizing Sappho</h2>
 						<p>
 							The literary corpus of Sappho is rife with references to mortals and gods alike -
-							<span style="background: lightpink;">Aphrodite</span>, Gonglya, Atthis, and brimming
+							<span style="background: lightpink;">Aphrodite</span>, Gongyla, Atthis, and brimming
 							with descriptions of
 							<span style="background: rgb(129, 194, 129);">beauty</span> and
 							<span style="background: lavender;">nature</span>.
