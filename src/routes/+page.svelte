@@ -24,6 +24,9 @@
 	let onHoverNode: number = 0;
 	let ignoreNodes: number[] = [];
 
+	let filterInput: HTMLTextAreaElement;
+	let inputList: string = '';
+
 	let packingData: d3.HierarchyCircularNode<unknown>[] = [];
 
 	$: data = packingData.filter((d) => d.depth == 2) as d3.HierarchyCircularNode<Fragment>[];
@@ -45,7 +48,8 @@
 			'#4B6F44',
 			'#452c63',
 			'#5072A7',
-			'#3457D5'
+			'#3457D5',
+			'#6A5ACD'
 		]);
 
 	$: x = d3
@@ -171,6 +175,8 @@
 								!sets[d.data.name].includes('silvery')
 						)
 						.map((d) => d.data.name);
+				} else if (response.index == 9) {
+					ignoreNodes = [];
 				}
 			})
 			.onStepExit((response) => {
@@ -344,9 +350,9 @@
 							associated fragments of similar length together.
 						</p>
 						<p>
-							Larger fragments also have more "gravity" - the longer they are, the more words they
-							have, and the more words there are, the more likely the algorithm will find word
-							similarities between fragments.
+							Larger fragments also have more <b><i>"gravity"</i></b> - the longer they are, the more
+							words they have, and the more words there are, the more likely the algorithm will find
+							word similarities between fragments.
 						</p>
 					</div>
 				</section>
@@ -354,8 +360,11 @@
 					<div class="scroll-step-content">
 						<p>
 							Notably, some of Sappho's most well known and frequently translated fragments are
-							grouped together, such as the Ode to Aphrodite (Fragment 1), Fragment 16, and Fragment
-							31.
+							grouped together, such as the <span style="background: lightpink; font-weight: bold;"
+								>Ode to Aphrodite (Fragment 1)</span
+							>
+							, <span style="background: gold; font-weight: bold;">Fragment 16</span>, and
+							<span style="background: lightblue; font-weight: bold;">Fragment 31</span>.
 						</p>
 					</div>
 				</section>
@@ -368,48 +377,174 @@
 							<p style="margin: 0;">
 								<b>Fragment 123</b>
 								<br />
-								just now goldsandaled Dawn
+								just now goldsandaled
+								<span
+									style="background: -webkit-linear-gradient(left, pink, orange, gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;">Dawn</span
+								>
 							</p>
 							<p style="margin: 0;">
 								<b>Fragment 157</b>
 								<br />
-								lady Dawn
+								lady
+								<span
+									style="background: -webkit-linear-gradient(left, pink, orange, gold);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;">Dawn</span
+								>
 							</p>
 							<p style="margin: 0;">
 								<b>Fragment 175</b>
 								<br />
-								dawn
+								<span
+									style="background: -webkit-linear-gradient(left, pink, orange, gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;">dawn</span
+								>
 							</p>
 						</div>
 						<p style="margin-top: 2rem;">
-							All mentioning dawn. Interesting! Let's see what other fragments have the word "dawn"
-							in them...
+							All mentioning dawn. Interesting! Let's see what other fragments have the word "<span
+								style="background: -webkit-linear-gradient(left, pink, orange, gold);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;">dawn</span
+							>" in them...
 						</p>
 					</div>
 				</section>
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
-						<p>dawn</p>
+						<p
+							style="background: -webkit-linear-gradient(left, pink, orange, gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; font-size: 1.5rem; text-align: center;"
+						>
+							dawn
+						</p>
+						<p style="margin-top: 5rem;">
+							Even though there's a strong correlation with the smallest cluster, it looks like the
+							word dawn is mentioned elsewhere as well.
+						</p>
+						<p>
+							Let's take a look at some other words! They might reveal interesting patterns in how
+							often words appear among different fragments, and whether it is a strong indicator of
+							where each fragment gets categorized.
+						</p>
 					</div>
 				</section>
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
-						<p>Aphrodite, Kypris, Kypros</p>
+						<p
+							style="background: -webkit-linear-gradient(left, pink, #D8BFD8, #545AA7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; font-size: 1.5rem; text-align: center;"
+						>
+							Aphrodite, Kypris, Kypros
+						</p>
 					</div>
 				</section>
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
-						<p>Eros</p>
+						<p
+							style="background: -webkit-linear-gradient(left, #0071c5, #ADD8E6, #5A4FCF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; font-size: 1.5rem; text-align: center;"
+						>
+							Eros
+						</p>
 					</div>
 				</section>
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
-						<p>gold, golden, goldhaired, goldsandaled</p>
+						<p
+							style="background: -webkit-linear-gradient(left, gold, orange, goldenrod, yellow);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; font-size: 1.5rem; text-align: center;"
+						>
+							gold, golden, goldhaired, goldsandaled
+						</p>
 					</div>
 				</section>
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
-						<p>moon, silver, silvery</p>
+						<p
+							style="background: -webkit-linear-gradient(left, darkgray, #B0C4DE, gray);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent; font-size: 1.5rem; text-align: center;"
+						>
+							moon, silver, silvery
+						</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content">
+						<p>That was interesting!</p>
+						<p>
+							While some categories, such as <span
+								style="background: -webkit-linear-gradient(left, pink, #D8BFD8, #545AA7);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;"
+							>
+								Aphrodite, Kypris, Kypros
+							</span>
+							and
+							<span
+								style="background: -webkit-linear-gradient(left, gold, orange, goldenrod);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;"
+							>
+								gold, golden, goldhaired, goldsandaled
+							</span>
+							appeared all across the map, other words such as
+							<span
+								style="background: -webkit-linear-gradient(left, darkgray, #B0C4DE, gray);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;"
+							>
+								moon, silver, silvery
+							</span> were more closely associated within the same few groupings.
+						</p>
+						<p>
+							Most interesting of all, all instances of the word <span
+								style="background: -webkit-linear-gradient(left, #0071c5, #ADD8E6, #5A4FCF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;"
+							>
+								Eros
+							</span> showed up in disparate categories.
+						</p>
+						<p>
+							Perhaps instead of a subject of Sappho's poems, <span
+								style="background: -webkit-linear-gradient(left, #0071c5, #ADD8E6, #5A4FCF);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;"
+							>
+								Eros
+							</span> is a constant.
+						</p>
+					</div>
+				</section>
+				<section class="scroll-step step">
+					<div class="scroll-step-content" style="text-align: center;">
+						<p>It's time to hand over the exploration to you, the reader!</p>
+						<!-- resizable textarea credits to https://css-tricks.com/auto-growing-inputs-textareas/ -->
+						<label class="input-sizer stacked">
+							<textarea
+								rows="1"
+								spellcheck="false"
+								placeholder="grove, apple, hyacinths..."
+								bind:this={filterInput}
+								bind:value={inputList}
+								on:input={() => (filterInput.parentNode.dataset.value = filterInput.value)}
+							></textarea>
+						</label>
+						<p>
+							<small>
+								Search for any word to fade in and out fragments that have those words. To search
+								for multiple words, separate each word with a comma.
+							</small>
+						</p>
 					</div>
 				</section>
 			</div>
@@ -546,6 +681,52 @@
 
 	.offset-step {
 		width: min(100%, 30rem);
+	}
+
+	.input-sizer {
+		display: inline-grid;
+		vertical-align: top;
+		align-items: center;
+		position: relative;
+		border: solid 1px;
+		padding: 0.25em 0.5em;
+		margin: 5px;
+
+		box-shadow: 4px 4px 0px #000;
+
+		&.stacked {
+			padding: 0.5em;
+			align-items: stretch;
+
+			&::after,
+			textarea {
+				grid-area: 2 / 1;
+			}
+		}
+
+		&::after,
+		textarea {
+			width: auto;
+			min-width: 1em;
+			grid-area: 1 / 2;
+
+			font: inherit;
+
+			padding: 0.25em;
+			margin: 0;
+
+			resize: none;
+			background: none;
+			appearance: none;
+			border: none;
+			outline: none;
+		}
+
+		&::after {
+			content: attr(data-value) ' ';
+			visibility: hidden;
+			white-space: pre-wrap;
+		}
 	}
 
 	@media screen and (max-width: 1200px) {
