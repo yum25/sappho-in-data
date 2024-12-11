@@ -527,7 +527,7 @@
 				</section>
 				<section class="scroll-step step">
 					<div class="scroll-step-content" style="text-align: center;">
-						<p>It's time to hand over the exploration to you, the reader!</p>
+						<p>It's time to hand over the exploration to you! Thanks for reading!</p>
 						<!-- resizable textarea credits to https://css-tricks.com/auto-growing-inputs-textareas/ -->
 						<label class="input-sizer stacked">
 							<textarea
