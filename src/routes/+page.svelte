@@ -13,11 +13,9 @@
 	const scroller = scrollama();
 
 	let svg: SVGElement;
-	let innerHeight: number;
-	let innerWidth: number;
-	let height: number;
-	let width: number;
-	let minR: number;
+	const height: number = 1100;
+	const width: number = 1100;
+	const minR: number = Math.round(height / 30);
 	const margin = 20;
 
 	let showHierarchy = false;
@@ -26,23 +24,26 @@
 
 	let filterInput: HTMLTextAreaElement;
 	let inputList: string = '';
-  let filter = false;
+	let filter = false;
 
-	let packingData: d3.HierarchyCircularNode<unknown>[] = [];
+	const pack = d3
+		.pack()
+		.size([height - margin, width - margin])
+		.padding(1);
 
-  $: {
-    if (filter && inputList.length > 0) {
-      const inputs = inputList.split(',').map((d) => d.trim().toLowerCase());
-      const hasntWord = (d:Fragment) => inputs.reduce((prev, input) => prev && !sets[d.name].includes(input), true)
+	const root = pack(
+		d3
+			.hierarchy(hierarchy as unknown)
+			.sum((d) => (d as Fragment).size)
+			.sort((a, b) => (b.value as number) - (a.value as number))
+	);
 
-      ignoreNodes = data.filter((d) => hasntWord(d.data)).map((d) => d.data.name);
-    }
-  }
+	const packingData: d3.HierarchyCircularNode<unknown>[] = root.descendants();
 
-	$: data = packingData.filter((d) => d.depth == 2) as d3.HierarchyCircularNode<Fragment>[];
-	$: clusters = packingData.filter((d) => d.depth == 1);
+	const data = packingData.filter((d) => d.depth == 2) as d3.HierarchyCircularNode<Fragment>[];
+	const clusters = packingData.filter((d) => d.depth == 1);
 
-	$: color = d3
+	const color = d3
 		.scaleOrdinal<number, string>()
 		.domain(clusters.map((d) => (d.data as Fragment).name))
 		.range([
@@ -62,68 +63,24 @@
 			'#6A5ACD'
 		]);
 
-	$: x = d3
-		.scaleOrdinal<number, number>()
-		.domain(clusters.map((d) => (d.data as Fragment).name))
-		.range(clusters.map((d) => d.x));
-	$: y = d3
-		.scaleOrdinal<number, number>()
-		.domain(clusters.map((d) => (d.data as Fragment).name))
-		.range(clusters.map((d) => d.y));
+	$: {
+		if (filter && inputList.trim().length > 0) {
+			const inputs = inputList.split(',').map((d) => d.trim().toLowerCase());
+			const hasntWord = (d: Fragment) =>
+				inputs.reduce((prev, input) => prev && !sets[d.name].includes(input), true);
 
-	const simulation = d3.forceSimulation(data);
-
-	$: simulation
-		.force(
-			'x',
-			d3
-				.forceX()
-				.strength(0.005)
-				.x((d) => x((d as d3.HierarchyNode<Fragment>).data.group))
-		)
-		.force(
-			'y',
-			d3
-				.forceY()
-				.strength(0.005)
-				.y((d) => y((d as d3.HierarchyNode<Fragment>).data.group))
-		)
-		.force(
-			'collide',
-			d3
-				.forceCollide()
-				.strength(0.1)
-				.radius((d) => (d as d3.HierarchyCircularNode<Fragment>).r + 1.5)
-				.iterations(1)
-		); // Force that avoids circle overlapping
-	$: simulation.on('tick', () => (data = data));
+			ignoreNodes = data.filter((d) => hasntWord(d.data)).map((d) => d.data.name);
+		} else if (filter && inputList.trim().length === 0) {
+			ignoreNodes = [];
+		}
+	}
 
 	onMount(() => {
-		height = 1100;
-		width = 1100;
-		minR = Math.round(height / 30);
-
-		const pack = d3
-			.pack()
-			.size([height - margin, width - margin])
-			.padding(1);
-
-		const root = pack(
-			d3
-				.hierarchy(hierarchy as unknown)
-				.sum((d) => (d as Fragment).size)
-				.sort((a, b) => (b.value as number) - (a.value as number))
-		);
-
-		packingData = root.descendants();
-
-		// setup the instance, pass callback functions
 		scroller
 			.setup({
 				step: '.step'
 			})
 			.onStepEnter((response) => {
-				// { element, index, direction }
 				if (response.index === 0 || response.index === 1) {
 					const [anchor1] = data.filter((d) => d.data.name == 1);
 					const [anchor2] = data.filter((d) => d.data.name == 123);
@@ -188,21 +145,18 @@
 				} else if (response.index === 9) {
 					ignoreNodes = [];
 				} else if (response.index === 10) {
-          filter = true;
-        }
+					filter = true;
+				}
 			})
 			.onStepExit((response) => {
-				// { element, index, direction }
 				if (response.index === 0 && response.direction === 'up') {
 					ignoreNodes = [];
 				} else if (response.index === 10) {
-          filter = false;
-        }
+					filter = false;
+				}
 			});
 	});
 </script>
-
-<svelte:window bind:innerHeight bind:innerWidth />
 
 <main>
 	<header>
@@ -360,13 +314,13 @@
 				<section class="scroll-step step">
 					<div class="scroll-step-content">
 						<p>
-							The algorithm used to group the fragments generally
-							associated fragments of similar lengths together.
+							The algorithm used to group the fragments generally associated fragments of similar
+							lengths together.
 						</p>
 						<p>
-							This makes sense - larger fragments have more <b><i>"gravity"</i></b> - the longer they are, the more
-							words they have, and the more words there are, the more likely the algorithm will find
-							word similarities between fragments.
+							This makes sense - larger fragments have more <b><i>"gravity"</i></b> - the longer they
+							are, the more words they have, and the more words there are, the more likely the algorithm
+							will find word similarities between fragments.
 						</p>
 					</div>
 				</section>
@@ -547,10 +501,10 @@
 							<textarea
 								rows="1"
 								spellcheck="false"
-								placeholder="grove, apple, hyacinths..."
+								placeholder="grove, apple, hyacinth..."
 								bind:this={filterInput}
 								bind:value={inputList}
-								on:input={() => (filterInput.parentNode.dataset.value = filterInput.value)}
+								on:input={() => (filterInput.parentNode!.dataset.value = filterInput.value)}
 							></textarea>
 						</label>
 						<p>
@@ -561,14 +515,18 @@
 						</p>
 					</div>
 				</section>
-        <section>
-          <div class="scroll-step-content" style="text-align: center;"> 
-            <small>
-              <p>Like what you see?<br/> <a style="color: inherit;" href="https://yum25.github.io">Check out my other work! :)</a></p>
-            </small>
-            
-          </div>
-        </section>
+				<section>
+					<div class="scroll-step-content" style="text-align: center;">
+						<small>
+							<p>
+								Like what you see?<br />
+								<a style="color: inherit;" href="https://yum25.github.io"
+									>Check out my other work! :)</a
+								>
+							</p>
+						</small>
+					</div>
+				</section>
 			</div>
 		</div>
 	</div>
