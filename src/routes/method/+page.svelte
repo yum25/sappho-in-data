@@ -9,7 +9,7 @@
 		<h2>Measuring Fragment Similarity</h2>
 	</section>
 	<section>
-		<h2>Categorizing Fragments With ML</h2>
+		<h2>Categorizing Fragments</h2>
 	</section>
 	<section>
 		<h2>Visualizing with Circle Packing</h2>
