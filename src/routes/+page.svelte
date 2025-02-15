@@ -267,8 +267,8 @@
 						algorithm?
 					</p>
 					<p>
-						Through measuring the <span style="text-decoration: underline;"
-							>number of words in common between fragments</span
+						Through measuring the <a href="/method" style="color: inherit;"
+							>number of words in common between fragments</a
 						>
 						and a little bit of math, I created a data visualization where each distinct
 						<b>grouping</b>
