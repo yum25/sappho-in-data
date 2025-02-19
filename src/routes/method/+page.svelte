@@ -37,9 +37,11 @@
 		<section>
 			<h2>III. <br /> Visualizing with Circle Packing</h2>
 			<p>
-				Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus quae rerum, consequuntur,
-				in cupiditate numquam amet aut deleniti exercitationem ut reprehenderit tempora commodi
-				omnis fugiat autem quis? Sint, nam est.
+				Finally, once I had all of my groups, all I had to do was visualize the data! I accomplished this through
+				D3's <a>hierarchy</a> library, where circular nodes can be placed on a 2D space from largest to smallest (to
+				fill up as much space as possible). This created a much more organized and visually pleasing display
+				compared to manually or randomly placing fragment groupings around. This way, smaller fragment groups
+				can also take up less space, rather than being placed equidistant to larger fragment groups.
 			</p>
 		</section>
 	</div>
