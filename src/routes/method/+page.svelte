@@ -26,7 +26,12 @@
 			<p>
 				Next, I needed to categorize the fragments based on the Jaccard Similarity scores between
 				each pair of fragments. Taking inspiration from my internship in computational biology where
-				I wrote scripts to categorize chromosome shapes, I calculated a pairwise matrix of
+				I wrote scripts to categorize chromosome shapes, I calculated a pairwise matrix of Jaccard Similarities.
+			</p>
+			<p>
+				Then, I inputted this matrix into an <a>Hierarchical Agglomerative Clustering</a> algorithm, which 
+				iteratively groups fragments based on "distance". The distance in this case is the numerical value we get
+				from calculating the Jaccard Similarity.
 			</p>
 		</section>
 		<section>
